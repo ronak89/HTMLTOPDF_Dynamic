@@ -62,7 +62,7 @@ namespace HTMLTOPDF.Controllers
 
         private ObjectSettings GetObjectSettings()
         {
-            var headerHtml = "<div class='header'><h1>This is the header title</h1></div>"; // Define header HTML content here
+            
             return new ObjectSettings
             {
                 PagesCount = true,

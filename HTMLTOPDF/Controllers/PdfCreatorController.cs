@@ -1,18 +1,19 @@
 ﻿using DinkToPdf;
 using DinkToPdf.Contracts;
 using HTMLTOPDF.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Text.Json;
+using System.util;
 
 namespace HTMLTOPDF.Controllers
 {
-    [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
     public class PdfCreatorController : ControllerBase
     {
         private IConverter _converter;
-        public PdfCreatorController(IConverter  converter)
+        public PdfCreatorController(IConverter converter)
         {
             _converter = converter;
         }
@@ -73,7 +74,7 @@ namespace HTMLTOPDF.Controllers
                 ColorMode = ColorMode.Color,
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
-                Margins = new MarginSettings { Top = 20, Bottom = 10, Left = 10, Right = 10 }, // Adjust margins as needed
+                Margins = new MarginSettings { Top = 40, Bottom = 10, Left = 10, Right = 10 }, // Adjust margins as needed
                 DocumentTitle = "PDF Report",
                 Out = @"D:\PDFCreator\Employee_Report.pdf"
             };
@@ -83,12 +84,13 @@ namespace HTMLTOPDF.Controllers
         private ObjectSettings GetObjectSettings()
         {
             
+
             return new ObjectSettings
             {
                 PagesCount = true,
                 HtmlContent = TemplateGenerator.GetHTMLString(),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = GetStyleSheetPath() },
-                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true,Spacing = 1.8,   },
+                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true, Spacing = 1.8, HtmUrl = Path.Combine(Directory.GetCurrentDirectory(), "assets", "htmlpage.html") },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
             };
         }
@@ -98,6 +100,7 @@ namespace HTMLTOPDF.Controllers
         {
             return Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css");
         }
+
 
     }
 }
