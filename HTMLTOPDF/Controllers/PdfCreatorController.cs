@@ -17,13 +17,13 @@ namespace HTMLTOPDF.Controllers
         {
             _converter = converter;
         }
-        [HttpGet]
-        public async Task<IActionResult> CreatePDF()
+        [HttpPost]   
+        public async Task<IActionResult> CreatePDF(ParentHeader parentHeader)
         {
             try
             {
                 var globalSettings = GetGlobalSettings();
-                var objectSettings = GetObjectSettings();
+                var objectSettings = GetObjectSettings(parentHeader);
 
                 var pdf = new HtmlToPdfDocument
                 {
@@ -95,24 +95,53 @@ namespace HTMLTOPDF.Controllers
 
 
         // Helper method to get object settings for HTML content
-        private ObjectSettings GetObjectSettings()
+        private ObjectSettings GetObjectSettings(ParentHeader userHeaderParam)
         {
+            string headingString = string.Empty;
+            string imagePath = string.Empty;
+            var userParamHeader = userHeaderParam.HeaderParameters;
+
+            int height = 200; // Example height
+            int width = 300; // Example width
+            string imgTag = string.Empty;
+
+            foreach (var userParam in userParamHeader)
+            {
+                string style = $"font-size: {userParam.FontSize}; color: {userParam.FontColor};";
+
+                // Split the Title string by commas
+                string[] titles = userParam.Title;
+                string titleString = string.Join(",", titles); // Concatenate array elements into a single string
+                string[] splittedTitles = titleString.Split(','); // Split the concatenated string
 
 
-            // HTML content for the header
-            GlobalHtmlTags htmlTags = GetHtmlTags();
-            // Define styles for the heading
-            var styles = new Dictionary<CssProperty, string>
+                // Iterate over each title and create a div element
+                foreach (var title in splittedTitles)
                 {
-                    { CssProperty.Color, "blue" },
-                    { CssProperty.FontSize, "24px" }
-                };
-            // Generate the heading HTML with styles
-            string headingHtml = HtmlGenerator.GenerateHtml(htmlTags.Heading1, "Document Title", styles);
+                    headingString += $"<div style=\"{style}\">{title}</div>";
+                }
+
+                imagePath = Path.Combine(Directory.GetCurrentDirectory(), "assets", userParam.Image);
+                imgTag = $"<img src=\"{imagePath}\" alt=\"Italian Trulli\" height=\"{height}\" width=\"{width}\">";
+
+                
+               
+            }
+
+            //// HTML content for the header
+            //GlobalHtmlTags htmlTags = GetHtmlTags();
+            //// Define styles for the heading
+            //var styles = new Dictionary<CssProperty, string>
+            //    {
+            //        { CssProperty.Color, "blue" },
+            //        { CssProperty.FontSize, "24px" }
+            //    };
+            //// Generate the heading HTML with styles
+            //string headingHtml = HtmlGenerator.GenerateHtml(htmlTags.Heading1, "Document Title", styles);
+
 
             string headerHtml = $@"<!DOCTYPE html>
                                     <html>
-                                    <{htmlTags.Tag}>
                                     <head>
                                         <title>Header</title>
                                         <style>
@@ -138,18 +167,58 @@ namespace HTMLTOPDF.Controllers
                                     <body>
                     <div class=""header-container"">
                         <div class=""left-content"">
-                            {headingHtml}
+                            {headingString}
                             <p>This is a custom header for the document. It beautifully encapsulates the essence of dynamic page numbering alongside a simplistic SVG illustration.</p>
                         </div>
                         <div class=""right-content"">
                             <div>Page [page] of [toPage]</div>
-                            <svg width=""100"" height=""100"" xmlns=""http://www.w3.org/2000/svg"">
-                                <circle cx=""50"" cy=""50"" r=""40"" stroke=""green"" stroke-width=""4"" fill=""yellow"" />
-                            </svg>
+                           {imgTag}
+                        
                         </div>
                     </div>
                     </body>
                     </html>";
+
+
+            //string headerHtml = $@"<!DOCTYPE html>
+            //                        <html>
+            //                        <head>
+            //                            <title>Header</title>
+            //                            <style>
+            //                                .header-container {{
+            //                                    display: flex;
+            //                                    justify-content: space-between;
+            //                                    font-family: Arial;
+            //                                    font-size: 9pt;
+            //                                }}
+            //                                .left-content, .right-content {{
+            //                                    display: flex;
+            //                                    flex-direction: column;
+            //                                    justify-content: center;
+            //                                }}
+            //                                .right-content {{
+            //                                    align-items: flex-end;
+            //                                }}
+            //                                svg {{
+            //                                    margin-top: 10px;
+            //                                }}
+            //                            </style>
+            //                        </head>
+            //                        <body>
+            //        <div class=""header-container"">
+            //            <div class=""left-content"">
+            //                <div>ABCD</div>
+            //                <p>This is a custom header for the document. It beautifully encapsulates the essence of dynamic page numbering alongside a simplistic SVG illustration.</p>
+            //            </div>
+            //            <div class=""right-content"">
+            //                <div>Page [page] of [toPage]</div>
+            //                <svg width=""100"" height=""100"" xmlns=""http://www.w3.org/2000/svg"">
+            //                    <circle cx=""50"" cy=""50"" r=""40"" stroke=""green"" stroke-width=""4"" fill=""yellow"" />
+            //                </svg>
+            //            </div>
+            //        </div>
+            //        </body>
+            //        </html>";
 
 
 
