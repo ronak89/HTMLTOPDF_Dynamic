@@ -1,4 +1,7 @@
-﻿namespace HTMLTOPDF.Models
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
+
+namespace HTMLTOPDF.Models
 {
     public class ParentHeader
     {
@@ -15,24 +18,35 @@
     {
         public UserProvideHeader() { 
             UserProvideHeaderString = string.Empty;
+            
         }
+        [Required(ErrorMessage = "User provide header string is required")]
+        [SwaggerSchema(Description = "The string provided by the user in the header.")]
         public string UserProvideHeaderString { get; set; }
+        
     }
     public class UserHeaderParam
     {
-        public UserHeaderParam() {
-
+        public UserHeaderParam()
+        {
             // Assign default values to properties
-            Title = new string[0]; // Empty array
+            Title = new List<string>();
             FontSize = string.Empty;
             FontColor = string.Empty;
-            Image = string.Empty; // Default value for Image
+            Image = string.Empty;
         }
-        public string[] Title { get; set; }
-        public string FontSize { get; set; } 
-        public string FontColor { get; set; }
-        public string Image { get; set; } // New field for Image
 
+        [Required(ErrorMessage = "Title is required")]
+        public List<string> Title { get; set; }
+
+        [Required(ErrorMessage = "Font size is required")]
+        public string FontSize { get; set; }
+
+        [Required(ErrorMessage = "Font color is required")]
+        public string FontColor { get; set; }
+
+        [Required(ErrorMessage = "Image URL is required")]
+        public string Image { get; set; }
     }
     public class UserImageForHeader
     {

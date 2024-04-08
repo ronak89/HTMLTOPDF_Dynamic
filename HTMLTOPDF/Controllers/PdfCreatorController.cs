@@ -18,24 +18,40 @@ namespace HTMLTOPDF.Controllers
             _converter = converter;
         }
         [HttpPost]   
-        public async Task<IActionResult> CreatePDF(ParentHeader parentHeader)
+        public IActionResult CreatePDF([FromBody] ParentHeader parentHeader)
         {
             try
             {
-                var globalSettings = GetGlobalSettings();
-                var objectSettings = GetObjectSettings(parentHeader);
-
-                var pdf = new HtmlToPdfDocument
+                string html = "";
+                PdfSettings settings = new PdfSettings
                 {
-                    GlobalSettings = globalSettings,
-                    Objects = { objectSettings }
+                    headerSettings = {HtmUrl=html},
+                    footerSettings = {HtmUrl=html},
+                    webSettings = {},
+                    ownGlobalSettings = {}
+
                 };
+                OwnPdfGenerates ownPdfGenerates = new OwnPdfGenerates();
 
-                // Asynchronously convert HTML to PDF
-                await Task.Run(() => _converter.Convert(pdf));
+                byte[] pdfBytes = ownPdfGenerates.GeneratePdf(settings, html);
 
-                // Return success message
-                return Ok("Successfully created PDF document.");
+                // Assuming you want to return the PDF as a file
+                return File(pdfBytes, "application/pdf", "output.pdf");
+
+                //var globalSettings = GetGlobalSettings();
+                //var objectSettings = GetObjectSettings(parentHeader);
+
+                //var pdf = new HtmlToPdfDocument
+                //{
+                //    GlobalSettings = globalSettings,
+                //    Objects = { objectSettings }
+                //};
+
+                //// Asynchronously convert HTML to PDF
+                //await Task.Run(() => _converter.Convert(pdf));
+
+                //// Return success message
+                //return Ok("Successfully created PDF document.");
             }
             catch (Exception ex)
             {
@@ -74,7 +90,7 @@ namespace HTMLTOPDF.Controllers
                 ColorMode = ColorMode.Color,
                 Orientation = Orientation.Portrait,
                 PaperSize = PaperKind.A4,
-                Margins = new MarginSettings { Top = 50, Bottom = 10, Left = 10, Right = 10 }, // Adjust margins as needed
+                Margins = new MarginSettings { Top = 100, Bottom = 10, Left = 10, Right = 10 }, // Adjust margins as needed
                 DocumentTitle = "PDF Report",
                 Out = @"D:\PDFCreator\Employee_Report.pdf"
             };
@@ -110,8 +126,11 @@ namespace HTMLTOPDF.Controllers
                 string style = $"font-size: {userParam.FontSize}; color: {userParam.FontColor};";
 
                 // Split the Title string by commas
-                string[] titles = userParam.Title;
-                string titleString = string.Join(",", titles); // Concatenate array elements into a single string
+                //string[] titles = userParam.Title;
+                //string titleString = string.Join(",", titles); // Concatenate array elements into a single string
+                //string[] splittedTitles = titleString.Split(','); // Split the concatenated string
+
+                string titleString = string.Join(",", userParam.Title); // Concatenate array elements into a single string
                 string[] splittedTitles = titleString.Split(','); // Split the concatenated string
 
 
